@@ -1,0 +1,32 @@
+2023/02/18
+
+問題を読んだ。
+https://atcoder.jp/contests/ahc018/tasks/ahc018_a
+
+thunder本でAHCと盛り上がっているところに、本に載っていない未知の情報を突き止めるタイプの問題でうける。
+
+Cが掘削の回数を制約するパラメタ。
+頑丈さは直接は得られず、掘削の回数を上げると精度が上がる。
+
+パーリンノイズは最近見たな。
+SECCONか。
+https://blog.arkark.dev/2022/11/18/seccon-ja/#misc-noiseccon
+
+細部が異なるバージョンがあるらしい。
+http://marupeke296.com/ALG_No3_PerlinNoize.html
+
+テスターにパーリンノイズの実装は無し。
+使っているのはこれか？
+https://github.com/Razaekel/noise-rs/blob/develop/src/core/perlin.rs
+
+```
+    /// Internally this uses a `XorShiftRng`, but we don't really need to worry
+    /// about cryptographic security when working with procedural noise.
+```
+https://github.com/Razaekel/noise-rs/blob/develop/src/permutationtable.rs
+
+暗号論的乱数は使っていない。
+乱数推測ができれば勝ちだが、難しいか。
+
+インタラクティブ問題を実際に動かすのは面倒なので、テスターを自前で実装したい。
+ということはパーリンノイズもいずれ必要になるし、理解を深めるためにまず実装するか。

@@ -30,3 +30,5 @@ https://github.com/Razaekel/noise-rs/blob/develop/src/permutationtable.rs
 
 インタラクティブ問題を実際に動かすのは面倒なので、テスターを自前で実装したい。
 ということはパーリンノイズもいずれ必要になるし、理解を深めるためにまず実装するか。
+
+改良パーリンノイズ、良く分からん……。

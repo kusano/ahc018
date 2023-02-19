@@ -4,6 +4,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <chrono>
+#include <utility>
+#include <queue>
 using namespace std;
 
 class UnionFind
@@ -58,7 +60,7 @@ class Solver
 public:
     virtual void solve(
         int WN,
-        int KN,
+        int HN,
         int C,
         vector<int> WX,
         vector<int> WY,
@@ -74,7 +76,7 @@ class SolverSample: public Solver
 public:
     virtual void solve(
         int WN,
-        int KN,
+        int HN,
         int C,
         vector<int> WX,
         vector<int> WY,
@@ -84,7 +86,7 @@ public:
     ) {
         bool R[N][N] = {};
 
-        for (int i=0; i<KN; i++)
+        for (int i=0; i<HN; i++)
         {
             int x = HX[i];
             int y = HY[i];
@@ -116,6 +118,162 @@ public:
             {
                 R[y][x] = true;
                 while (excavate(x, y, 100)==0);
+            }
+        }
+    };
+};
+
+class SolverMain: public Solver
+{
+public:
+    virtual void solve(
+        int WN,
+        int HN,
+        int C,
+        vector<int> WX,
+        vector<int> WY,
+        vector<int> HX,
+        vector<int> HY,
+        function<int(int x, int y, int P)> excavate
+    ) {
+        // 掘削済み。
+        bool excavated[N][N] = {};
+
+        int S[N][N];
+        for (int y=0; y<N; y++)
+            for (int x=0; x<N; x++)
+                S[y][x] = 5000;
+
+        // 試掘。
+        int CS = 10;
+        for (int cy=0; cy<N; cy+=CS)
+            for (int cx=0; cx<N; cx+=CS)
+            {
+                int x = cx+CS/2;
+                int y = cy+CS/2;
+                for (int i=0; i<5; i++)
+                    if (excavate(x, y, 100)==1)
+                    {
+                        excavated[y][x] = true;
+                        S[y][x] = 100*(i+1);
+                        break;
+                    }
+            }
+
+        // 最近傍
+        //for (int cy=0; cy<N; cy+=CS)
+        //    for (int cx=0; cx<N; cx+=CS)
+        //        for (int dx=0; dx<CS; dx++)
+        //            for (int dy=0; dy<CS; dy++)
+        //                S[cy+dy][cx+dx] = S[cy+CS/2][cx+CS/2];
+
+        // とりあえず線型補間。
+        for (int cy=CS/2; cy<N; cy+=CS)
+        {
+            for (int x=0; x<CS/2; x++)
+                S[cy][x] = S[cy][CS/2];
+            for (int cx=CS/2; cx+CS<N; cx+=CS)
+                for (int dx=1; dx<CS; dx++)
+                    S[cy][cx+dx] = (S[cy][cx]*(CS-dx)+dx*S[cy][cx+CS]+CS/2)/CS;
+            for (int x=N-CS+CS/2+1; x<N; x++)
+                S[cy][x] = S[cy][N-CS+CS/2];
+        }
+        for (int x=0; x<N; x++)
+        {
+            for (int y=0; y<CS/2; y++)
+                S[y][x] = S[CS/2][x];
+            for (int cy=CS/2; cy+CS<N; cy+=CS)
+                for (int dy=1; dy<CS; dy++)
+                    S[cy+dy][x] = (S[cy][x]*(CS-dy)+dy*S[cy+CS][x]+CS/2)/CS;
+            for (int y=N-CS+CS/2+1; y<N; y++)
+                S[y][x] = S[N-CS+CS/2][x];
+        }
+        //for (int y=0; y<N; y++)
+        //{
+        //    for (int x=0; x<N; x++)
+        //        cout<<" "<<S[y][x];
+        //    cout<<endl;
+        //}
+
+        auto breakRock = [&](int x, int y)
+        {
+            if (excavated[y][x])
+                return;
+            excavated[y][x] = true;
+            while (excavate(x, y, 100)==0);
+        };
+
+        // 家を掘削。
+        for (int h=0; h<HN; h++)
+            breakRock(HX[h], HY[h]);
+
+        // 家に水を通す。
+        for (int h=0; h<HN; h++)
+        {
+            int S2[N][N];
+            for (int y=0; y<N; y++)
+                for (int x=0; x<N; x++)
+                {
+                    S2[y][x] = S[y][x];
+                    if (excavated[y][x])
+                        S2[y][x] = 0;
+                }
+
+            int oo = 99999999;
+            int D[N][N];
+            for (int y=0; y<N; y++)
+                for (int x=0; x<N; x++)
+                    D[y][x] = oo;
+            int PX[N][N];
+            int PY[N][N];
+            priority_queue<pair<int, pair<int, int>>> Q;
+            for (int w=0; w<WN; w++)
+            {
+                int x = WX[w];
+                int y = WY[w];
+                D[y][x] = S2[y][x];
+                PX[y][x] = -1;
+                Q.push({-D[y][x], {x, y}});
+            }
+
+            int DX[] = {1, -1, 0, 0};
+            int DY[] = {0, 0, 1, -1};
+
+            int hx = HX[h];
+            int hy = HY[h];
+            while (D[hy][hx]==oo)
+            {
+                int d = -Q.top().first;
+                int x = Q.top().second.first;
+                int y = Q.top().second.second;
+                Q.pop();
+                if (d>D[y][x])
+                    continue;
+
+                for (int d=0; d<4; d++)
+                {
+                    int tx = x+DX[d];
+                    int ty = y+DY[d];
+                    if (0<=tx && tx<N && 0<=ty && ty<N &&
+                        D[y][x]+S2[ty][tx]<D[ty][tx])
+                    {
+                        D[ty][tx] = D[y][x]+S2[ty][tx];
+                        PX[ty][tx] = x;
+                        PY[ty][tx] = y;
+                        Q.push({-D[ty][tx], {tx, ty}});
+                    }
+                }
+            }
+
+            int x = PX[hy][hx];
+            int y = PY[hy][hx];
+            while (x>=0)
+            {
+                breakRock(x, y);
+                int nx = PX[y][x];
+                int ny = PY[y][x];
+                x = nx;
+                y = ny;
             }
         }
     };
@@ -170,7 +328,7 @@ void solveLocal(Solver *solver)
 
         if (S[y][x]<=0)
         {
-            cout<<"error"<<endl;
+            cerr<<"error"<<endl;
             exit(1);
         }
 
@@ -214,7 +372,9 @@ void solveLocal(Solver *solver)
 
 int main()
 {
-    SolverSample solver;
-    //solveJudge(&solver);
-    solveLocal(&solver);
+    //SolverSample solver;
+    SolverMain solver;
+
+    solveJudge(&solver);
+    //solveLocal(&solver);
 }

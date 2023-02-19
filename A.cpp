@@ -375,6 +375,9 @@ int main()
     //SolverSample solver;
     SolverMain solver;
 
+#ifdef TOPCODER_LOCAL
+    solveLocal(&solver);
+#else
     solveJudge(&solver);
-    //solveLocal(&solver);
+#endif
 }

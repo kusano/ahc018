@@ -145,55 +145,210 @@ public:
                 S[y][x] = 5000;
 
         // 試掘。
-        int CS = 10;
-        for (int cy=0; cy<N; cy+=CS)
-            for (int cx=0; cx<N; cx+=CS)
-            {
-                int x = cx+CS/2;
-                int y = cy+CS/2;
-                for (int i=0; i<5; i++)
-                    if (excavate(x, y, 100)==1)
+        auto prospect = [&](int x, int y)
+        {
+            for (int i=0; i<5; i++)
+                if (excavate(x, y, 100)==1)
+                {
+                    excavated[y][x] = true;
+                    S[y][x] = 100*(i+1);
+                    break;
+                }
+        };
+
+        // 補間。
+        auto interpolate = [&](int level, int S[N][N], int S2[N][N])
+        {
+            for (int y=0; y<N; y++)
+                for (int x=0; x<N; x++)
+                {
+                    if (level%2==0)
                     {
-                        excavated[y][x] = true;
-                        S[y][x] = 100*(i+1);
-                        break;
+                        int d = 1<<(level/2);
+                        int rx = ((x-N/2)%d+d)%d;
+                        int ry = ((y-N/2)%d+d)%d;
+                        // s0 s1
+                        // s2 s3
+                        int s0 = 0<=x-rx  && 0<=y-ry  ? S[y-ry][x-rx]     : 0<=x-rx  ? S[y-ry+d][x-rx]   : 0<=y-ry  ? S[y-ry][x-rx+d]   : S[y-ry+d][x-rx+d];
+                        int s1 = x-rx+d<N && 0<=y-ry  ? S[y-ry][x-rx+d]   : x-rx+d<N ? S[y-ry+d][x-rx+d] : 0<=y-ry  ? S[y-ry][x-rx]     : S[y-ry+d][x-rx];
+                        int s2 = 0<=x-rx  && y-ry+d<N ? S[y-ry+d][x-rx]   : 0<=x-rx  ? S[y-ry][x-rx]     : y-ry+d<N ? S[y-ry+d][x-rx+d] : S[y-ry][x-rx+d];
+                        int s3 = x-rx+d<N && y-ry+d<N ? S[y-ry+d][x-rx+d] : x-rx+d<N ? S[y-ry][x-rx+d]   : y-ry+d<N ? S[y-ry+d][x-rx]   : S[y-ry][x-rx];
+                        S2[y][x] = (s0*(d-rx)*(d-ry)+s1*rx*(d-ry)+s2*(d-rx)*ry+s3*rx*ry+d*d/2)/(d*d);
                     }
+                    else
+                    {
+                        int d = 1<<(level/2);
+                        int rx = (((x-N/2)+d)%(d*2)+d*2)%(d*2)-d;
+                        int ry = (((y-N/2)  )%(d*2)+d*2)%(d*2)-d;
+                        if (-rx-ry>d)
+                        {
+                            rx += d;
+                            ry += d;
+                        }
+                        else if (rx-ry>d)
+                        {
+                            rx -= d;
+                            ry += d;
+                        }
+                        else if (-rx+ry>d)
+                        {
+                            rx += d;
+                            ry -= d;
+                        }
+                        else if (rx+ry>d)
+                        {
+                            rx -= d;
+                            ry -= d;
+                        }
+                        //   s0
+                        // s1  s2
+                        //   s3
+                        int s0p = 0<=x-rx   && x-rx  <N && 0<=y-ry-d && y-ry-d<N ? S[y-ry-d][x-rx  ] : -1;
+                        int s1p = 0<=x-rx-d && x-rx-d<N && 0<=y-ry   && y-ry  <N ? S[y-ry  ][x-rx-d] : -1;
+                        int s2p = 0<=x-rx+d && x-rx+d<N && 0<=y-ry   && y-ry  <N ? S[y-ry  ][x-rx+d] : -1;
+                        int s3p = 0<=x-rx   && x-rx  <N && 0<=y-ry+d && y-ry+d<N ? S[y-ry+d][x-rx  ] : -1;
+
+                        int s0 = s0p;
+                        if (s0==-1)
+                        {
+                            if (s1p==-1 && s2p==-1)
+                                s0 = s3p;
+                            else if (s1p==-1 && s3p==-1)
+                                s0 = s2p;
+                            else if (s2p==-1 && s3p==-1)
+                                s0 = s1p;
+                            else if (s1p==-1)
+                                s0 = s2p;
+                            else if (s2p==-1)
+                                s0 = s1p;
+                            else
+                                s0 = (s1p+s2p)/2;
+                        }
+                        int s1 = s1p;
+                        if (s1==-1)
+                        {
+                            if (s0p==-1 && s2p==-1)
+                                s1 = s3p;
+                            else if (s0p==-1 && s3p==-1)
+                                s1 = s2p;
+                            else if (s2p==-1 && s3p==-1)
+                                s1 = s0p;
+                            else if (s0p==-1)
+                                s1 = s3p;
+                            else if (s3p==-1)
+                                s1 = s0p;
+                            else
+                                s1 = (s0p+s3p)/2;
+                        }
+                        int s2 = s2p;
+                        if (s2==-1)
+                        {
+                            if (s0p==-1 && s1p==-1)
+                                s2 = s3p;
+                            else if (s0p==-1 && s3p==-1)
+                                s2 = s1p;
+                            else if (s1p==-1 && s3p==-1)
+                                s2 = s0p;
+                            else if (s0p==-1)
+                                s2 = s3p;
+                            else if (s3p==-1)
+                                s2 = s0p;
+                            else
+                                s2 = (s0p+s3p)/2;
+                        }
+                        int s3 = s3p;
+                        if (s3==-1)
+                        {
+                            if (s0p==-1 && s1p==-1)
+                                s3 = s2p;
+                            else if (s0p==-1 && s2p==-1)
+                                s3 = s1p;
+                            else if (s1p==-1 && s2p==-1)
+                                s3 = s0p;
+                            else if (s1p==-1)
+                                s3 = s2p;
+                            else if (s2p==-1)
+                                s3 = s1p;
+                            else
+                                s3 = (s1p+s2p)/2;
+                        }
+                        if (s0>=0)
+                            S2[y][x] = ((d-(rx+ry))*(d-(ry-rx))*s0+(d-(rx+ry))*(d+(ry-rx))*s1+(d+(rx+ry))*(d-(ry-rx))*s2+(d+(rx+ry))*(d+(ry-rx))*s3+2*d*d)/(4*d*d);
+                        else
+                            S2[y][x] = 5000;
+                    }
+                }
+        };
+
+        // 頑丈さがSと仮定し、掘削するべき場所を返す。
+        auto dijkstra = [&](int S[N][N], bool R[N][N])
+        {
+            for (int y=0; y<N; y++)
+                for (int x=0; x<N; x++)
+                    R[y][x] = false;
+
+            for (int h=0; h<HN; h++)
+            {
+                int oo = 99999999;
+                int D[N][N];
+                for (int y=0; y<N; y++)
+                    for (int x=0; x<N; x++)
+                        D[y][x] = oo;
+                int PX[N][N];
+                int PY[N][N];
+                priority_queue<pair<int, pair<int, int>>> Q;
+                for (int w=0; w<WN; w++)
+                {
+                    int x = WX[w];
+                    int y = WY[w];
+                    D[y][x] = S[y][x]+C;
+                    PX[y][x] = -1;
+                    Q.push({-D[y][x], {x, y}});
+                }
+
+                int DX[] = {1, -1, 0, 0};
+                int DY[] = {0, 0, 1, -1};
+
+                int hx = HX[h];
+                int hy = HY[h];
+                while (D[hy][hx]==oo)
+                {
+                    int d = -Q.top().first;
+                    int x = Q.top().second.first;
+                    int y = Q.top().second.second;
+                    Q.pop();
+                    if (d>D[y][x])
+                        continue;
+
+                    for (int d=0; d<4; d++)
+                    {
+                        int tx = x+DX[d];
+                        int ty = y+DY[d];
+                        if (0<=tx && tx<N && 0<=ty && ty<N &&
+                            D[y][x]+S[ty][tx]+C<D[ty][tx])
+                        {
+                            D[ty][tx] = D[y][x]+S[ty][tx]+C;
+                            PX[ty][tx] = x;
+                            PY[ty][tx] = y;
+                            Q.push({-D[ty][tx], {tx, ty}});
+                        }
+                    }
+                }
+
+                int x = hx;
+                int y = hy;
+                while (x>=0)
+                {
+                    R[y][x] = true;
+                    S[y][x] = 0;
+
+                    int nx = PX[y][x];
+                    int ny = PY[y][x];
+                    x = nx;
+                    y = ny;
+                }
             }
-
-        // 最近傍
-        //for (int cy=0; cy<N; cy+=CS)
-        //    for (int cx=0; cx<N; cx+=CS)
-        //        for (int dx=0; dx<CS; dx++)
-        //            for (int dy=0; dy<CS; dy++)
-        //                S[cy+dy][cx+dx] = S[cy+CS/2][cx+CS/2];
-
-        // とりあえず線型補間。
-        for (int cy=CS/2; cy<N; cy+=CS)
-        {
-            for (int x=0; x<CS/2; x++)
-                S[cy][x] = S[cy][CS/2];
-            for (int cx=CS/2; cx+CS<N; cx+=CS)
-                for (int dx=1; dx<CS; dx++)
-                    S[cy][cx+dx] = (S[cy][cx]*(CS-dx)+dx*S[cy][cx+CS]+CS/2)/CS;
-            for (int x=N-CS+CS/2+1; x<N; x++)
-                S[cy][x] = S[cy][N-CS+CS/2];
-        }
-        for (int x=0; x<N; x++)
-        {
-            for (int y=0; y<CS/2; y++)
-                S[y][x] = S[CS/2][x];
-            for (int cy=CS/2; cy+CS<N; cy+=CS)
-                for (int dy=1; dy<CS; dy++)
-                    S[cy+dy][x] = (S[cy][x]*(CS-dy)+dy*S[cy+CS][x]+CS/2)/CS;
-            for (int y=N-CS+CS/2+1; y<N; y++)
-                S[y][x] = S[N-CS+CS/2][x];
-        }
-        //for (int y=0; y<N; y++)
-        //{
-        //    for (int x=0; x<N; x++)
-        //        cout<<" "<<S[y][x];
-        //    cout<<endl;
-        //}
+        };
 
         auto breakRock = [&](int x, int y)
         {
@@ -203,79 +358,147 @@ public:
             while (excavate(x, y, 100)==0);
         };
 
-        // 家を掘削。
-        for (int h=0; h<HN; h++)
-            breakRock(HX[h], HY[h]);
+        int level = 12;
 
-        // 家に水を通す。
-        for (int h=0; h<HN; h++)
+        for (int y=0; y<N; y++)
+            for (int x=0; x<N; x++)
+                if (level%2==0)
+                {
+                    int d = 1<<(level/2);
+                    if ((x-N/2)%d==0 && (y-N/2)%d==0)
+                        prospect(x, y);
+                }
+                else
+                {
+                    int d = 1<<(level/2);
+                    if ((x-N/2)%d==0 && (y-N/2)%d==0 && (((x-N/2)/d^(y-N/2)/d)&1)==0)
+                        prospect(x, y);
+                }
+
+        for (; level>=8; level--)
         {
             int S2[N][N];
+            interpolate(level, S, S2);
             for (int y=0; y<N; y++)
                 for (int x=0; x<N; x++)
-                {
-                    S2[y][x] = S[y][x];
                     if (excavated[y][x])
                         S2[y][x] = 0;
-                }
+            for (int h=0; h<HN; h++)
+                S2[HY[h]][HX[h]] = 0;
 
-            int oo = 99999999;
-            int D[N][N];
+            bool R[N][N];
+            dijkstra(S2, R);
+
+            // 掘削する場所に近い試掘場所をマーク。
+            bool M[N][N] = {};
+
             for (int y=0; y<N; y++)
                 for (int x=0; x<N; x++)
-                    D[y][x] = oo;
-            int PX[N][N];
-            int PY[N][N];
-            priority_queue<pair<int, pair<int, int>>> Q;
-            for (int w=0; w<WN; w++)
-            {
-                int x = WX[w];
-                int y = WY[w];
-                D[y][x] = S2[y][x];
-                PX[y][x] = -1;
-                Q.push({-D[y][x], {x, y}});
-            }
-
-            int DX[] = {1, -1, 0, 0};
-            int DY[] = {0, 0, 1, -1};
-
-            int hx = HX[h];
-            int hy = HY[h];
-            while (D[hy][hx]==oo)
-            {
-                int d = -Q.top().first;
-                int x = Q.top().second.first;
-                int y = Q.top().second.second;
-                Q.pop();
-                if (d>D[y][x])
-                    continue;
-
-                for (int d=0; d<4; d++)
-                {
-                    int tx = x+DX[d];
-                    int ty = y+DY[d];
-                    if (0<=tx && tx<N && 0<=ty && ty<N &&
-                        D[y][x]+S2[ty][tx]<D[ty][tx])
+                    if (R[y][x])
                     {
-                        D[ty][tx] = D[y][x]+S2[ty][tx];
-                        PX[ty][tx] = x;
-                        PY[ty][tx] = y;
-                        Q.push({-D[ty][tx], {tx, ty}});
+                        int tx, ty;
+                        if (level%2==0)
+                        {
+                            int d = 1<<(level/2);
+                            int rx = ((x-N/2)%d+d)%d;
+                            int ry = ((y-N/2)%d+d)%d;
+                            if (rx<d/2)
+                                tx = x-rx;
+                            else
+                                tx = x-rx+d;
+                            if (ry<d/2)
+                                ty = y-ry;
+                            else
+                                ty = y-ry+d;
+                        }
+                        else
+                        {
+                            int d = 1<<(level/2);
+                            int rx = (((x-N/2)+d)%(d*2)+d*2)%(d*2)-d;
+                            int ry = (((y-N/2)  )%(d*2)+d*2)%(d*2)-d;
+                            tx = x-rx;
+                            ty = y-ry;
+                            if (ry<=0 && abs(rx)<=abs(ry))
+                                ty -= d;
+                            else if (abs(rx)<abs(ry))
+                                ty += d;
+                            else if (rx<0)
+                                tx -= d;
+                            else
+                                tx += d;
+                        }
+                        if (0<=tx && tx<N && 0<=ty && ty<N)
+                            M[ty][tx] = true;
+                    }
+
+            // 次のレベルの試掘。
+            if (level==0)
+                continue;
+            for (int y=0; y<N; y++)
+                for (int x=0; x<N; x++)
+                {
+                    int d1 = 1<<(level/2);
+                    int d2 = 1<<((level-1)/2);
+                    if (level%2==0)
+                    {
+                        if (!((x-N/2)%d1==0 && (y-N/2)%d1==0) &&
+                            (x-N/2)%d2==0 && (y-N/2)%d2==0 && (((x-N/2)/d2^(y-N/2)/d2)&1)==0)
+                        {
+                            int dx[] = {1, -1, 1, -1};
+                            int dy[] = {1, 1, -1, -1};
+                            for (int d=0; d<4; d++)
+                            {
+                                int tx = x+dx[d]*d2;
+                                int ty = y+dy[d]*d2;
+                                if (0<=tx && tx<N && 0<=ty && ty<N &&
+                                    M[ty][tx])
+                                {
+                                    prospect(x, y);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (!((x-N/2)%d1==0 && (y-N/2)%d1==0 && (((x-N/2)/d1^(y-N/2)/d1)&1)==0 &&
+                            (x-N/2)%d2==0 && (y-N/2)%d2==0))
+                        {
+                            int dx[] = {1, -1, 0, 0};
+                            int dy[] = {0, 0, 1, -1};
+                            for (int d=0; d<4; d++)
+                            {
+                                int tx = x+dx[d]*d2;
+                                int ty = y+dy[d]*d2;
+                                if (0<=tx && tx<N && 0<=ty && ty<N &&
+                                    M[ty][tx])
+                                {
+                                    prospect(x, y);
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
-            }
-
-            int x = PX[hy][hx];
-            int y = PY[hy][hx];
-            while (x>=0)
-            {
-                breakRock(x, y);
-                int nx = PX[y][x];
-                int ny = PY[y][x];
-                x = nx;
-                y = ny;
-            }
         }
+
+        // 掘削
+        int S2[N][N];
+        interpolate(level, S, S2);
+        for (int y=0; y<N; y++)
+            for (int x=0; x<N; x++)
+                if (excavated[y][x])
+                    S2[y][x] = 0;
+        for (int h=0; h<HN; h++)
+            S2[HY[h]][HX[h]] = 0;
+
+        bool R[N][N];
+        dijkstra(S2, R);
+
+        for (int y=0; y<N; y++)
+            for (int x=0; x<N; x++)
+                if (R[y][x])
+                    breakRock(x, y);
     };
 };
 

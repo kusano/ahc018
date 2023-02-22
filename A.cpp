@@ -126,6 +126,13 @@ public:
 class SolverMain: public Solver
 {
 public:
+    int LEVEL_START = 14;
+    int LEVEL_END = 8;
+    int PROSPECT_P = 56;
+    int PROSPECT_N = 3;
+    int BREAK_DECAY = 80;
+    int BREAK_ADD = 18;
+
     virtual void solve(
         int WN,
         int HN,
@@ -151,8 +158,8 @@ public:
         // 試掘。
         auto prospect = [&](int x, int y)
         {
-            int P = 100;
-            for (int i=0; i<5; i++)
+            int P = PROSPECT_P;
+            for (int i=0; i<PROSPECT_N; i++)
                 if (excavate(x, y, P)==1)
                 {
                     excavated[y][x] = true;
@@ -359,7 +366,7 @@ public:
             }
         };
 
-        int level = 12;
+        int level = LEVEL_START;
 
         for (int y=0; y<N; y++)
             for (int x=0; x<N; x++)
@@ -376,7 +383,7 @@ public:
                         prospect(x, y);
                 }
 
-        for (; level>=8; level--)
+        for (; level>=LEVEL_END; level--)
         {
             int S2[N][N];
             interpolate(level, Smax, S2);
@@ -527,19 +534,19 @@ public:
                 if (n>0)
                     p = (ps+n/2)/n;
 
-                if (excavate(x, y, max(10, p*90/100))!=0)
+                if (excavate(x, y, max(10, p*BREAK_DECAY/100))!=0)
                 {
-                    Smax[y][x] = Smin[y][x]+max(10, p*90/100);
+                    Smax[y][x] = Smin[y][x]+max(10, p*BREAK_DECAY/100);
                 }
                 else
                 {
-                    Smin[y][x] += max(10, p*90/100);
+                    Smin[y][x] += max(10, p*BREAK_DECAY/100);
                     while (true)
-                        if (excavate(x, y, max(10, p*20/100))==0)
-                            Smin[y][x] += max(10, p*20/100);
+                        if (excavate(x, y, max(10, p*BREAK_ADD/100))==0)
+                            Smin[y][x] += max(10, p*BREAK_ADD/100);
                         else
                         {
-                            Smax[y][x] = Smin[y][x]+max(10, p*20/100);
+                            Smax[y][x] = Smin[y][x]+max(10, p*BREAK_ADD/100);
                             break;
                         }
                 }
@@ -651,10 +658,20 @@ void solveLocal(Solver *solver)
     fprintf(stderr, "%1d %2d %3d %.3f %6d %8lld\n", W, K, C, time, n, score);
 }
 
-int main()
+int main(int argc, char **argv)
 {
     //SolverSample solver;
     SolverMain solver;
+
+    if (argc>1)
+    {
+        solver.LEVEL_START = atoi(argv[1]);
+        solver.LEVEL_END = atoi(argv[2]);
+        solver.PROSPECT_P = atoi(argv[3]);
+        solver.PROSPECT_N = atoi(argv[4]);
+        solver.BREAK_DECAY = atoi(argv[5]);
+        solver.BREAK_ADD = atoi(argv[6]);
+    }
 
 #ifdef TOPCODER_LOCAL
     solveLocal(&solver);

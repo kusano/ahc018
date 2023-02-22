@@ -139,20 +139,29 @@ public:
         // 掘削済み。
         bool excavated[N][N] = {};
 
-        int S[N][N];
+        int Smin[N][N];
+        int Smax[N][N];
         for (int y=0; y<N; y++)
             for (int x=0; x<N; x++)
-                S[y][x] = 5000;
+            {
+                Smin[y][x] = 0;
+                Smax[y][x] = 5000;
+            }
 
         // 試掘。
         auto prospect = [&](int x, int y)
         {
+            int P = 100;
             for (int i=0; i<5; i++)
-                if (excavate(x, y, 100)==1)
+                if (excavate(x, y, P)==1)
                 {
                     excavated[y][x] = true;
-                    S[y][x] = 100*(i+1);
+                    Smax[y][x] = Smin[y][x]+P;
                     break;
+                }
+                else
+                {
+                    Smin[y][x] += P;
                 }
         };
 
@@ -350,14 +359,6 @@ public:
             }
         };
 
-        auto breakRock = [&](int x, int y)
-        {
-            if (excavated[y][x])
-                return;
-            excavated[y][x] = true;
-            while (excavate(x, y, 100)==0);
-        };
-
         int level = 12;
 
         for (int y=0; y<N; y++)
@@ -378,7 +379,7 @@ public:
         for (; level>=8; level--)
         {
             int S2[N][N];
-            interpolate(level, S, S2);
+            interpolate(level, Smax, S2);
             for (int y=0; y<N; y++)
                 for (int x=0; x<N; x++)
                     if (excavated[y][x])
@@ -484,7 +485,7 @@ public:
 
         // 掘削
         int S2[N][N];
-        interpolate(level, S, S2);
+        interpolate(level, Smax, S2);
         for (int y=0; y<N; y++)
             for (int x=0; x<N; x++)
                 if (excavated[y][x])
@@ -495,9 +496,66 @@ public:
         bool R[N][N];
         dijkstra(S2, R);
 
+        bool U[N][N] ={};
+        int dx[] = {1, -1, 0, 0};
+        int dy[] = {0, 0, 1, -1};
+
+        function<void(int, int)> breakRock = [&](int x, int y)
+        {
+            if (U[y][x])
+                return;
+            U[y][x] = true;
+
+            if (!excavated[y][x])
+            {
+                excavated[y][x] = true;
+                // 周囲の破壊に必要だったパワーの平均を求め、それを少し減らしたパワーで掘削する。
+                // ここでの掘削は基本的に一撃なので、Sminは見ない。
+                int ps = 0;
+                int n = 0;
+                for (int d=0; d<4; d++)
+                {
+                    int tx = x+dx[d];
+                    int ty = y+dy[d];
+                    if (0<=tx && tx<N && 0<=ty && ty<N && excavated[ty][tx])
+                    {
+                        ps += Smax[ty][tx];
+                        n ++;
+                    }
+                }
+                int p = 100;
+                if (n>0)
+                    p = (ps+n/2)/n;
+
+                if (excavate(x, y, max(10, p*90/100))!=0)
+                {
+                    Smax[y][x] = Smin[y][x]+max(10, p*90/100);
+                }
+                else
+                {
+                    Smin[y][x] += max(10, p*90/100);
+                    while (true)
+                        if (excavate(x, y, max(10, p*20/100))==0)
+                            Smin[y][x] += max(10, p*20/100);
+                        else
+                        {
+                            Smax[y][x] = Smin[y][x]+max(10, p*20/100);
+                            break;
+                        }
+                }
+            }
+
+            for (int d=0; d<4; d++)
+            {
+                int tx = x+dx[d];
+                int ty = y+dy[d];
+                if (0<=tx && tx<N && 0<=ty && ty<N && R[ty][tx])
+                    breakRock(tx, ty);
+            }
+        };
         for (int y=0; y<N; y++)
             for (int x=0; x<N; x++)
-                if (R[y][x])
+                if (R[y][x] && !U[y][x])
                     breakRock(x, y);
     };
 };

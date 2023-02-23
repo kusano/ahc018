@@ -465,48 +465,6 @@ public:
             bool R[N][N];
             dijkstra(S2, R);
 
-            // 掘削する場所に近い試掘場所をマーク。
-            bool M[N][N] = {};
-
-            for (int y=0; y<N; y++)
-                for (int x=0; x<N; x++)
-                    if (R[y][x])
-                    {
-                        int tx, ty;
-                        if (level%2==0)
-                        {
-                            int d = 1<<(level/2);
-                            int rx = ((x-N/2)%d+d)%d;
-                            int ry = ((y-N/2)%d+d)%d;
-                            if (rx<d/2)
-                                tx = x-rx;
-                            else
-                                tx = x-rx+d;
-                            if (ry<d/2)
-                                ty = y-ry;
-                            else
-                                ty = y-ry+d;
-                        }
-                        else
-                        {
-                            int d = 1<<(level/2);
-                            int rx = (((x-N/2)+d)%(d*2)+d*2)%(d*2)-d;
-                            int ry = (((y-N/2)  )%(d*2)+d*2)%(d*2)-d;
-                            tx = x-rx;
-                            ty = y-ry;
-                            if (ry<=0 && abs(rx)<=abs(ry))
-                                ty -= d;
-                            else if (abs(rx)<abs(ry))
-                                ty += d;
-                            else if (rx<0)
-                                tx -= d;
-                            else
-                                tx += d;
-                        }
-                        if (0<=tx && tx<N && 0<=ty && ty<N)
-                            M[ty][tx] = true;
-                    }
-
             // 次のレベルの試掘。
             if (level==0)
                 continue;
@@ -520,19 +478,18 @@ public:
                         if (!((x-N/2)%d1==0 && (y-N/2)%d1==0) &&
                             (x-N/2)%d2==0 && (y-N/2)%d2==0 && (((x-N/2)/d2^(y-N/2)/d2)&1)==0)
                         {
-                            int dx[] = {1, -1, 1, -1};
-                            int dy[] = {1, 1, -1, -1};
-                            for (int d=0; d<4; d++)
-                            {
-                                int tx = x+dx[d]*d2;
-                                int ty = y+dy[d]*d2;
-                                if (0<=tx && tx<N && 0<=ty && ty<N &&
-                                    M[ty][tx])
+                            bool f = false;
+                            for (int dy=-d2; dy<=d2 && !f; dy++)
+                                for (int dx=d2-abs(dy); dx<=d2+abs(dy) && !f; dx++)
                                 {
-                                    prospect(x, y);
-                                    break;
+                                    int tx = x+dx;
+                                    int ty = y+dy;
+                                    if (0<=tx && tx<N && 0<=ty && ty<N &&
+                                        R[ty][tx])
+                                        f = true;
                                 }
-                            }
+                            if (f)
+                                prospect(x, y);
                         }
                     }
                     else
@@ -540,19 +497,18 @@ public:
                         if (!((x-N/2)%d1==0 && (y-N/2)%d1==0 && (((x-N/2)/d1^(y-N/2)/d1)&1)==0) &&
                             (x-N/2)%d2==0 && (y-N/2)%d2==0)
                         {
-                            int dx[] = {1, -1, 0, 0};
-                            int dy[] = {0, 0, 1, -1};
-                            for (int d=0; d<4; d++)
-                            {
-                                int tx = x+dx[d]*d2;
-                                int ty = y+dy[d]*d2;
-                                if (0<=tx && tx<N && 0<=ty && ty<N &&
-                                    M[ty][tx])
+                            bool f = false;
+                            for (int dy=-d2/2; dy<=d2/2 && !f; dy++)
+                                for (int dx=-d2/2; dx<=d2/2 && !f; dx++)
                                 {
-                                    prospect(x, y);
-                                    break;
+                                    int tx = x+dx;
+                                    int ty = y+dy;
+                                    if (0<=tx && tx<N && 0<=ty && ty<N &&
+                                        R[ty][tx])
+                                        f = true;
                                 }
-                            }
+                            if (f)
+                                prospect(x, y);
                         }
                     }
                 }

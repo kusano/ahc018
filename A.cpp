@@ -146,68 +146,68 @@ public:
         switch (C)
         {
         case 1:
-            LEVEL_START = 12;
-            LEVEL_END = 8;
-            PROSPECT_P = 10;
+            LEVEL_START = 14;
+            LEVEL_END = 9;
+            PROSPECT_P = 21;
             PROSPECT_N = 15;
-            BREAK_DECAY = 74;
-            BREAK_ADD = 7;
+            BREAK_DECAY = 58;
+            BREAK_ADD = 3;
             break;
         case 2:
-            LEVEL_START = 12;
+            LEVEL_START = 9;
             LEVEL_END = 8;
-            PROSPECT_P = 28;
-            PROSPECT_N = 7;
-            BREAK_DECAY = 46;
-            BREAK_ADD = 19;
+            PROSPECT_P = 25;
+            PROSPECT_N = 8;
+            BREAK_DECAY = 76;
+            BREAK_ADD = 3;
             break;
         case 4:
-            LEVEL_START = 16;
-            LEVEL_END = 8;
-            PROSPECT_P = 50;
-            PROSPECT_N = 5;
-            BREAK_DECAY = 33;
-            BREAK_ADD = 45;
-            break;
-        case 8:
-            LEVEL_START = 13;
-            LEVEL_END = 9;
-            PROSPECT_P = 41;
-            PROSPECT_N = 6;
-            BREAK_DECAY = 54;
-            BREAK_ADD = 41;
-            break;
-        case 16:
             LEVEL_START = 15;
             LEVEL_END = 9;
-            PROSPECT_P = 98;
-            PROSPECT_N = 4;
-            BREAK_DECAY = 70;
-            BREAK_ADD = 42;
-            break;
-        case 32:
-            LEVEL_START = 12;
-            LEVEL_END = 9;
-            PROSPECT_P = 89;
-            PROSPECT_N = 4;
-            BREAK_DECAY = 86;
-            BREAK_ADD = 25;
-            break;
-        case 64:
-            LEVEL_START = 9;
-            LEVEL_END = 9;
-            PROSPECT_P = 70;
-            PROSPECT_N = 6;
+            PROSPECT_P = 24;
+            PROSPECT_N = 14;
             BREAK_DECAY = 74;
-            BREAK_ADD = 48;
+            BREAK_ADD = 6;
             break;
-        case 128:
+        case 8:
+            LEVEL_START = 14;
+            LEVEL_END = 8;
+            PROSPECT_P = 41;
+            PROSPECT_N = 6;
+            BREAK_DECAY = 78;
+            BREAK_ADD = 8;
+            break;
+        case 16:
             LEVEL_START = 12;
             LEVEL_END = 9;
             PROSPECT_P = 49;
             PROSPECT_N = 5;
-            BREAK_DECAY = 94;
-            BREAK_ADD = 54;
+            BREAK_DECAY = 81;
+            BREAK_ADD = 14;
+            break;
+        case 32:
+            LEVEL_START = 16;
+            LEVEL_END = 9;
+            PROSPECT_P = 92;
+            PROSPECT_N = 4;
+            BREAK_DECAY = 82;
+            BREAK_ADD = 18;
+            break;
+        case 64:
+            LEVEL_START = 9;
+            LEVEL_END = 9;
+            PROSPECT_P = 59;
+            PROSPECT_N = 4;
+            BREAK_DECAY = 85;
+            BREAK_ADD = 21;
+            break;
+        case 128:
+            LEVEL_START = 15;
+            LEVEL_END = 9;
+            PROSPECT_P = 137;
+            PROSPECT_N = 2;
+            BREAK_DECAY = 86;
+            BREAK_ADD = 35;
             break;
         }
 

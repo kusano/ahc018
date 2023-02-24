@@ -147,7 +147,7 @@ public:
         {
         case 1:
             LEVEL_START = 14;
-            LEVEL_END = 9;
+            LEVEL_END = 8;
             PROSPECT_P = 21;
             PROSPECT_N = 15;
             BREAK_DECAY = 58;
@@ -155,7 +155,7 @@ public:
             break;
         case 2:
             LEVEL_START = 9;
-            LEVEL_END = 8;
+            LEVEL_END = 7;
             PROSPECT_P = 25;
             PROSPECT_N = 8;
             BREAK_DECAY = 76;
@@ -163,7 +163,7 @@ public:
             break;
         case 4:
             LEVEL_START = 15;
-            LEVEL_END = 9;
+            LEVEL_END = 8;
             PROSPECT_P = 24;
             PROSPECT_N = 14;
             BREAK_DECAY = 74;
@@ -171,7 +171,7 @@ public:
             break;
         case 8:
             LEVEL_START = 14;
-            LEVEL_END = 8;
+            LEVEL_END = 7;
             PROSPECT_P = 41;
             PROSPECT_N = 6;
             BREAK_DECAY = 78;
@@ -179,7 +179,7 @@ public:
             break;
         case 16:
             LEVEL_START = 12;
-            LEVEL_END = 9;
+            LEVEL_END = 8;
             PROSPECT_P = 49;
             PROSPECT_N = 5;
             BREAK_DECAY = 81;
@@ -187,7 +187,7 @@ public:
             break;
         case 32:
             LEVEL_START = 16;
-            LEVEL_END = 9;
+            LEVEL_END = 8;
             PROSPECT_P = 92;
             PROSPECT_N = 4;
             BREAK_DECAY = 82;
@@ -195,7 +195,7 @@ public:
             break;
         case 64:
             LEVEL_START = 9;
-            LEVEL_END = 9;
+            LEVEL_END = 8;
             PROSPECT_P = 59;
             PROSPECT_N = 4;
             BREAK_DECAY = 85;
@@ -203,7 +203,7 @@ public:
             break;
         case 128:
             LEVEL_START = 15;
-            LEVEL_END = 9;
+            LEVEL_END = 8;
             PROSPECT_P = 137;
             PROSPECT_N = 2;
             BREAK_DECAY = 86;
@@ -467,7 +467,7 @@ public:
                         prospect(x, y);
                 }
 
-        for (; level>=LEVEL_END; level--)
+        for (; level>LEVEL_END; level--)
         {
             int S2[N][N];
             interpolate(level, Smax, S2);
@@ -524,8 +524,6 @@ public:
                     }
 
             // 次のレベルの試掘。
-            if (level==0)
-                continue;
             for (int y=0; y<N; y++)
                 for (int x=0; x<N; x++)
                 {

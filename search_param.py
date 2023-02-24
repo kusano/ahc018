@@ -5,7 +5,8 @@ import sys
 
 pwn.context.log_level = "error"
 
-C = int(sys.argv[1])
+#C = int(sys.argv[1])
+K = int(sys.argv[1])
 
 params = []
 for l in open("seeds.txt"):
@@ -22,7 +23,7 @@ def objective(trial):
   score = 0
   n = 0
   for i in range(len(params)):
-    if params[i][3]==C:
+    if params[i][2]==K:
       s = pwn.process(f"./A {level_start} {level_end} {prospect_p} {prospect_n} {break_decay} {break_add} < in/{i:04d}.txt > /dev/null", shell=True)
       score += int(s.readline().split()[-1])
       n += 1
@@ -30,7 +31,7 @@ def objective(trial):
   return score/n
 
 study = optuna.create_study(
-  study_name=f"ahc018_5_{C}",
+  study_name=f"ahc018_8_{K}",
   storage="sqlite:///db.sqlite3",
   load_if_exists=True,
   direction="minimize")

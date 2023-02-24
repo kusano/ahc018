@@ -371,6 +371,9 @@ public:
                 for (int x=0; x<N; x++)
                     R[y][x] = false;
 
+            // 添え字の家に水路が繋がったか
+            vector<bool> H(HN);
+
             for (int h=0; h<HN; h++)
             {
                 int oo = 99999999;
@@ -393,9 +396,9 @@ public:
                 int DX[] = {1, -1, 0, 0};
                 int DY[] = {0, 0, 1, -1};
 
-                int hx = HX[h];
-                int hy = HY[h];
-                while (D[hy][hx]==oo)
+                int hx;
+                int hy;
+                while (true)
                 {
                     int d = -Q.top().first;
                     int x = Q.top().second.first;
@@ -403,6 +406,19 @@ public:
                     Q.pop();
                     if (d>D[y][x])
                         continue;
+
+                    bool ok = false;
+                    for (int h=0; h<HN; h++)
+                        if (!H[h] && HX[h]==x && HY[h]==y)
+                        {
+                            H[h] = true;
+                            hx = x;
+                            hy = y;
+                            ok = true;
+                            break;
+                        }
+                    if (ok)
+                        break;
 
                     for (int d=0; d<4; d++)
                     {

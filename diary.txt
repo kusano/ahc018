@@ -782,3 +782,15 @@ Kを変えてパラメタを調整したところ、試掘場所を減らさな�
 0099.txt 3  4   2 0.225   1918    57929
 
 最初の試掘は最短経路の近くだけで良いかと思ったけど、家と水場が離れているときにダメ。
+
+https://github.com/microsoft/WSL/issues/8529
+
+
+[I 2023-02-25 17:08:47,297] Trial 440 finished with value: 85422.1325 and parameters: {'level_start': 13, 'level_end': 7, 'prospect_p': 13, 'prospect_n': 13, 'break_decay': 75, 'break_add': 3}. Best is trial 440 with value: 85422.1325.
+[I 2023-02-25 17:08:59,064] Trial 604 finished with value: 89677.4525 and parameters: {'level_start': 15, 'level_end': 7, 'prospect_p': 24, 'prospect_n': 12, 'break_decay': 78, 'break_add': 10}. Best is trial 604 with value: 89677.4525.
+[I 2023-02-25 18:06:50,958] Trial 552 finished with value: 96599.3875 and parameters: {'level_start': 11, 'level_end': 8, 'prospect_p': 56, 'prospect_n': 7, 'break_decay': 76, 'break_add': 4}. Best is trial 552 with value: 96599.3875.
+[I 2023-02-25 19:26:44,466] Trial 556 finished with value: 99160.1775 and parameters: {'level_start': 12, 'level_end': 7, 'prospect_p': 33, 'prospect_n': 7, 'break_decay': 75, 'break_add': 7}. Best is trial 556 with value: 99160.1775.
+[I 2023-02-25 18:30:21,013] Trial 491 finished with value: 106720.0475 and parameters: {'level_start': 16, 'level_end': 8, 'prospect_p': 55, 'prospect_n': 5, 'break_decay': 79, 'break_add': 15}. Best is trial 491 with value: 106720.0475.
+[I 2023-02-25 17:54:21,587] Trial 622 finished with value: 127276.9825 and parameters: {'level_start': 12, 'level_end': 7, 'prospect_p': 48, 'prospect_n': 3, 'break_decay': 82, 'break_add': 16}. Best is trial 622 with value: 127276.9825.
+[I 2023-02-25 19:33:33,695] Trial 680 finished with value: 153720.9275 and parameters: {'level_start': 15, 'level_end': 8, 'prospect_p': 94, 'prospect_n': 3, 'break_decay': 85, 'break_add': 25}. Best is trial 680 with value: 153720.9275.
+[I 2023-02-25 17:42:48,116] Trial 471 finished with value: 201686.5625 and parameters: {'level_start': 16, 'level_end': 8, 'prospect_p': 119, 'prospect_n': 2, 'break_decay': 87, 'break_add': 30}. Best is trial 471 with value: 201686.5625.

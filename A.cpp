@@ -6,6 +6,7 @@
 #include <chrono>
 #include <utility>
 #include <queue>
+#include <cmath>
 using namespace std;
 
 class UnionFind
@@ -132,6 +133,7 @@ public:
     int PROSPECT_N = 0;
     int BREAK_DECAY = 0;
     int BREAK_ADD = 0;
+    int DIJKSTRA_C = 0;
 
     virtual void solve(
         int WN,
@@ -153,6 +155,7 @@ public:
                 PROSPECT_N = 13;
                 BREAK_DECAY = 75;
                 BREAK_ADD = 3;
+                DIJKSTRA_C = 1;
                 break;
             case 2:
                 LEVEL_START = 15;
@@ -161,6 +164,7 @@ public:
                 PROSPECT_N = 12;
                 BREAK_DECAY = 78;
                 BREAK_ADD = 10;
+                DIJKSTRA_C = 2;
                 break;
             case 4:
                 LEVEL_START = 11;
@@ -169,6 +173,7 @@ public:
                 PROSPECT_N = 7;
                 BREAK_DECAY = 76;
                 BREAK_ADD = 4;
+                DIJKSTRA_C = 4;
                 break;
             case 8:
                 LEVEL_START = 12;
@@ -177,6 +182,7 @@ public:
                 PROSPECT_N = 7;
                 BREAK_DECAY = 75;
                 BREAK_ADD = 7;
+                DIJKSTRA_C = 8;
                 break;
             case 16:
                 LEVEL_START = 16;
@@ -185,6 +191,7 @@ public:
                 PROSPECT_N = 5;
                 BREAK_DECAY = 79;
                 BREAK_ADD = 15;
+                DIJKSTRA_C = 16;
                 break;
             case 32:
                 LEVEL_START = 12;
@@ -193,6 +200,7 @@ public:
                 PROSPECT_N = 3;
                 BREAK_DECAY = 82;
                 BREAK_ADD = 16;
+                DIJKSTRA_C = 32;
                 break;
             case 64:
                 LEVEL_START = 15;
@@ -201,6 +209,7 @@ public:
                 PROSPECT_N = 3;
                 BREAK_DECAY = 85;
                 BREAK_ADD = 25;
+                DIJKSTRA_C = 64;
                 break;
             case 128:
                 LEVEL_START = 16;
@@ -209,6 +218,7 @@ public:
                 PROSPECT_N = 2;
                 BREAK_DECAY = 87;
                 BREAK_ADD = 30;
+                DIJKSTRA_C = 128;
                 break;
             }
 
@@ -258,7 +268,13 @@ public:
                         int s1 = x-rx+d<N && 0<=y-ry  ? S[y-ry][x-rx+d]   : x-rx+d<N ? S[y-ry+d][x-rx+d] : 0<=y-ry  ? S[y-ry][x-rx]     : S[y-ry+d][x-rx];
                         int s2 = 0<=x-rx  && y-ry+d<N ? S[y-ry+d][x-rx]   : 0<=x-rx  ? S[y-ry][x-rx]     : y-ry+d<N ? S[y-ry+d][x-rx+d] : S[y-ry][x-rx+d];
                         int s3 = x-rx+d<N && y-ry+d<N ? S[y-ry+d][x-rx+d] : x-rx+d<N ? S[y-ry][x-rx+d]   : y-ry+d<N ? S[y-ry+d][x-rx]   : S[y-ry][x-rx];
-                        S2[y][x] = (s0*(d-rx)*(d-ry)+s1*rx*(d-ry)+s2*(d-rx)*ry+s3*rx*ry+d*d/2)/(d*d);
+                        double s0f = pow(max(10, min(5000, s0))/5000., 1./3.);
+                        double s1f = pow(max(10, min(5000, s1))/5000., 1./3.);
+                        double s2f = pow(max(10, min(5000, s2))/5000., 1./3.);
+                        double s3f = pow(max(10, min(5000, s3))/5000., 1./3.);
+                        double sf = (s0f*(d-rx)*(d-ry)+s1f*rx*(d-ry)+s2f*(d-rx)*ry+s3f*rx*ry)/(d*d);
+                        S2[y][x] = max(10, min(5000, int(pow(sf, 3.)*5000+.5)));
+                        //S2[y][x] = (s0*(d-rx)*(d-ry)+s1*rx*(d-ry)+s2*(d-rx)*ry+s3*rx*ry+d*d/2)/(d*d);
                     }
                     else
                     {
@@ -358,7 +374,15 @@ public:
                                 s3 = (s1p+s2p)/2;
                         }
                         if (s0>=0)
-                            S2[y][x] = ((d-(rx+ry))*(d-(ry-rx))*s0+(d-(rx+ry))*(d+(ry-rx))*s1+(d+(rx+ry))*(d-(ry-rx))*s2+(d+(rx+ry))*(d+(ry-rx))*s3+2*d*d)/(4*d*d);
+                        {
+                            double s0f = pow(max(10, min(5000, s0))/5000., 1./3.);
+                            double s1f = pow(max(10, min(5000, s1))/5000., 1./3.);
+                            double s2f = pow(max(10, min(5000, s2))/5000., 1./3.);
+                            double s3f = pow(max(10, min(5000, s3))/5000., 1./3.);
+                            double sf = ((d-(rx+ry))*(d-(ry-rx))*s0f+(d-(rx+ry))*(d+(ry-rx))*s1f+(d+(rx+ry))*(d-(ry-rx))*s2f+(d+(rx+ry))*(d+(ry-rx))*s3f)/(4*d*d);
+                            S2[y][x] = max(10, min(5000, int(pow(sf, 3.)*5000+.5)));
+                            //S2[y][x] = ((d-(rx+ry))*(d-(ry-rx))*s0+(d-(rx+ry))*(d+(ry-rx))*s1+(d+(rx+ry))*(d-(ry-rx))*s2+(d+(rx+ry))*(d+(ry-rx))*s3+2*d*d)/(4*d*d);
+                        }
                         else
                             S2[y][x] = 5000;
                     }
@@ -389,7 +413,7 @@ public:
                 {
                     int x = WX[w];
                     int y = WY[w];
-                    D[y][x] = S[y][x]+C;
+                    D[y][x] = max(1, S[y][x]-Smin[y][x])+DIJKSTRA_C;
                     PX[y][x] = -1;
                     Q.push({-D[y][x], {x, y}});
                 }
@@ -426,9 +450,9 @@ public:
                         int tx = x+DX[d];
                         int ty = y+DY[d];
                         if (0<=tx && tx<N && 0<=ty && ty<N &&
-                            D[y][x]+S[ty][tx]+C<D[ty][tx])
+                            D[y][x]+max(1, S[ty][tx]-Smin[y][x])+DIJKSTRA_C<D[ty][tx])
                         {
-                            D[ty][tx] = D[y][x]+S[ty][tx]+C;
+                            D[ty][tx] = D[y][x]+max(1, S[ty][tx]-Smin[y][x])+DIJKSTRA_C;
                             PX[ty][tx] = x;
                             PY[ty][tx] = y;
                             Q.push({-D[ty][tx], {tx, ty}});
@@ -617,16 +641,16 @@ public:
                 if (n>0)
                     p = (ps+n/2)/n;
 
-                if (excavate(x, y, max(10, p*BREAK_DECAY/100))!=0)
+                if (excavate(x, y, max(10, p*BREAK_DECAY/100-Smin[y][x]))!=0)
                 {
                     Smax[y][x] = Smin[y][x]+max(10, p*BREAK_DECAY/100);
                 }
                 else
                 {
-                    Smin[y][x] += max(10, p*BREAK_DECAY/100);
+                    Smin[y][x] += max(10, p*BREAK_DECAY/100-Smin[y][x]);
                     while (true)
-                        if (excavate(x, y, max(10, p*BREAK_ADD/100))==0)
-                            Smin[y][x] += max(10, p*BREAK_ADD/100);
+                        if (excavate(x, y, max(1, p*BREAK_ADD/100))==0)
+                            Smin[y][x] += max(1, p*BREAK_ADD/100);
                         else
                         {
                             Smax[y][x] = Smin[y][x]+max(10, p*BREAK_ADD/100);
@@ -754,6 +778,7 @@ int main(int argc, char **argv)
         solver.PROSPECT_N = atoi(argv[4]);
         solver.BREAK_DECAY = atoi(argv[5]);
         solver.BREAK_ADD = atoi(argv[6]);
+        solver.DIJKSTRA_C = atoi(argv[7]);
     }
 
 #ifdef TOPCODER_LOCAL

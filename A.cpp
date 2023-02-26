@@ -149,75 +149,75 @@ public:
             switch (C)
             {
             case 1:
-                LEVEL_START = 13;
+                LEVEL_START = 11;
                 LEVEL_END = 7;
-                PROSPECT_P = 13;
-                PROSPECT_N = 13;
+                PROSPECT_P = 22;
+                PROSPECT_N = 10;
                 BREAK_DECAY = 75;
                 BREAK_ADD = 3;
-                DIJKSTRA_C = 1;
+                DIJKSTRA_C = 165;
                 break;
             case 2:
-                LEVEL_START = 15;
+                LEVEL_START = 18;
                 LEVEL_END = 7;
-                PROSPECT_P = 24;
-                PROSPECT_N = 12;
-                BREAK_DECAY = 78;
-                BREAK_ADD = 10;
-                DIJKSTRA_C = 2;
-                break;
-            case 4:
-                LEVEL_START = 11;
-                LEVEL_END = 8;
-                PROSPECT_P = 56;
-                PROSPECT_N = 7;
+                PROSPECT_P = 30;
+                PROSPECT_N = 8;
                 BREAK_DECAY = 76;
-                BREAK_ADD = 4;
-                DIJKSTRA_C = 4;
-                break;
-            case 8:
-                LEVEL_START = 12;
-                LEVEL_END = 7;
-                PROSPECT_P = 33;
-                PROSPECT_N = 7;
-                BREAK_DECAY = 75;
-                BREAK_ADD = 7;
+                BREAK_ADD = 12;
                 DIJKSTRA_C = 8;
                 break;
-            case 16:
-                LEVEL_START = 16;
+            case 4:
+                LEVEL_START = 14;
                 LEVEL_END = 8;
-                PROSPECT_P = 55;
+                PROSPECT_P = 21;
+                PROSPECT_N = 17;
+                BREAK_DECAY = 76;
+                BREAK_ADD = 18;
+                DIJKSTRA_C = 6;
+                break;
+            case 8:
+                LEVEL_START = 18;
+                LEVEL_END = 7;
+                PROSPECT_P = 39;
+                PROSPECT_N = 6;
+                BREAK_DECAY = 80;
+                BREAK_ADD = 10;
+                DIJKSTRA_C = 92;
+                break;
+            case 16:
+                LEVEL_START = 18;
+                LEVEL_END = 8;
+                PROSPECT_P = 57;
                 PROSPECT_N = 5;
                 BREAK_DECAY = 79;
-                BREAK_ADD = 15;
-                DIJKSTRA_C = 16;
+                BREAK_ADD = 9;
+                DIJKSTRA_C = 220;
                 break;
             case 32:
-                LEVEL_START = 12;
-                LEVEL_END = 7;
-                PROSPECT_P = 48;
-                PROSPECT_N = 3;
-                BREAK_DECAY = 82;
-                BREAK_ADD = 16;
-                DIJKSTRA_C = 32;
+                LEVEL_START = 15;
+                LEVEL_END = 8;
+                PROSPECT_P = 62;
+                PROSPECT_N = 4;
+                BREAK_DECAY = 81;
+                BREAK_ADD = 20;
+                DIJKSTRA_C = 160;
                 break;
             case 64:
                 LEVEL_START = 15;
                 LEVEL_END = 8;
-                PROSPECT_P = 94;
+                PROSPECT_P = 87;
                 PROSPECT_N = 3;
-                BREAK_DECAY = 85;
-                BREAK_ADD = 25;
-                DIJKSTRA_C = 64;
+                BREAK_DECAY = 86;
+                BREAK_ADD = 41;
+                DIJKSTRA_C = 111;
                 break;
             case 128:
-                LEVEL_START = 16;
+                LEVEL_START = 13;
                 LEVEL_END = 8;
-                PROSPECT_P = 119;
-                PROSPECT_N = 2;
-                BREAK_DECAY = 87;
-                BREAK_ADD = 30;
+                PROSPECT_P = 127;
+                PROSPECT_N = 1;
+                BREAK_DECAY = 83;
+                BREAK_ADD = 31;
                 DIJKSTRA_C = 128;
                 break;
             }
